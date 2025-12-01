@@ -1,45 +1,25 @@
 #/bin/bash
 
-# fancygrim for hyprland (nvidia)
-# features:
-#  - read README.md on git repo (https://github.com/memyboi/fancygrim)
-#  - im too lazy to rewrite them here ;-;
+# fancygrim https://github.com/memyboi/fancygrim
+
+# Default configuration
+Shadow=false # whether or not to have a shadow by default, you can enable this with the "--shadow" flag
+CornerIntensity=10 # how intense the corners should be, you can modify this with the "--corner" flag
+
+Notification=true # whether or not to send a notification after the screenshot has been taken.
+PreNotification=true # whether or not to send a notification after the screenshot has begun processing.
+NotificationImage=true # whether or not the notification that is sent after the screenshot is taken should include that screenshot, you can disable this with the "--noimage" flag
+
+CopyToClipboard=true # whether or not to copy the Image do your clipboard, you can disable this with the "--nocopy" flag
+PasteOnce=false # whether or not the screenshot can be pasted only once, you can enable this with the "--pasteonce" flag
+WriteImage=false # whether or not to write the image to disk, you can enable this with the "--write" flag 
+WriteDirectory="/home/$USER/Pictures" # where the image should be written to disk, you can modify this with the "--writedir" flag
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-# RUNTIME
-SHADOW=false
-CORNER=10
-NOTIF=true
-PRENOTIF=true
-COPY=true
-ONEPASTE=false
-NOTIFIMAGE=true
-
-
-
-
-#   ____ ___  ____  _____
-#  / ___/ _ \|  _ \| ____|
-# | |  | | | | | | |  _|
-# | |__| |_| | |_| | |___
-#  \____\___/|____/|_____|
-# DO NOT MODIFY THE FOLLOWING UNLESS YOU KNOW WHAT YOU'RE DOING
 usage() {
   echo "Usage:"
-  echo "  fancygrim (area|window|full) [--corner (N) | -c (N)] [--shadow | -s] [--silence | -d] [--pasteonce | -o] [--nocopy | -n] [--noimage -i]"
+  echo "  fancygrim (area|window|full) [--corner (N) | -c (N)] [--shadow | -s] [--silence | -d] [--pasteonce | -o] [--nocopy | -n] [--noimage -i] [--write | -w] [--writedir (PATH) | -p]"
   echo "  fancygrim usage"
   echo ""
   echo "  area:"
@@ -62,27 +42,35 @@ addcorners() {
     -compose DstIn -composite /tmp/fancygrimss.png
 }
 
+write() {
+  if [ $WriteImage = true ]; then
+    # todo: make this formattable
+    SCREENSHOTNAME="screenshot-$(date "+%Y-%m-%d-%I:%M:%S")"
+    cp /tmp/fancygrimss.png "$WriteDirectory/$SCREENSHOTNAME.png"
+  fi
+}
+
 copytoclipboard() {
-  if [ $COPY = true ]; then
-    ONCE=""
-    if [ $ONEPASTE = true ]; then
-      ONCE="-o"
+  if [ $CopyToClipboard = true ]; then
+    COPYFLAG=""
+    if [ $PasteOnce = true ]; then
+      COPYFLAG="-o"
     fi
-    wl-copy $ONCE < /tmp/fancygrimss.png
+    wl-copy $COPYFLAG < /tmp/fancygrimss.png
   fi
 }
 
 sendnotif() {
-  if [ $NOTIF = true ]; then
-    IMAGE=""
-    CLIPBOARD="screenshot saved to /tmp/fancygrimss.png."
-    if [ $NOTIFIMAGE = true ]; then
-      IMAGE='-i /tmp/fancygrimss.png'
+  if [ $Notification = true ]; then
+    IMAGEFLAG=""
+    NOTIFICATIONBODY="screenshot saved to /tmp/fancygrimss.png."
+    if [ $NotificationImage = true ]; then
+      IMAGEFLAG='-i /tmp/fancygrimss.png'
     fi
-    if [ $COPY = true ]; then
-      CLIPBOARD='screenshot copied to clipboard.'
+    if [ $CopyToClipboard = true ]; then
+      NOTIFICATIONBODY='screenshot copied to clipboard.'
     fi
-    notify-send -t 2000 "Screenshot taken" "$1 $CLIPBOARD" $IMAGE
+    notify-send -t 2000 "Screenshot taken" "$1 $NOTIFICATIONBODY" $IMAGEFLAG
   fi
 }
 
@@ -90,26 +78,27 @@ area() {
   grim "/tmp/fancygrimss.png"
   hyprpicker -z -r &
   sleep 0.2
-  hyprpicker_pid=$!
+  HYPRPICKER_PID=$!
   RAWRES=$(slurp)
   IFS=' ' read -ra SPLITRAWRES <<< "$RAWRES"
   IFS=',' read -ra RAWPOS <<< "${SPLITRAWRES[0]}"
   IFS='x' read -ra RAWSIZE <<< "${SPLITRAWRES[1]}"
   RES=${RAWSIZE[0]}x${RAWSIZE[1]}+${RAWPOS[0]}+${RAWPOS[1]}
   if [ "$RES" = "x++" ]; then
-    kill "$hyprpicker_pid"
+    kill "$HYPRPICKER_PID"
   else
-    kill "$hyprpicker_pid"
+    kill "$HYPRPICKER_PID"
     prenotif
     magick /tmp/fancygrimss.png -crop $RES /tmp/fancygrimss.png
-    if [ $CORNER -gt 0 ]; then 
-      addcorners "${RAWSIZE[0]}" "${RAWSIZE[1]}" "$CORNER"
+    if [ $CornerIntensity -gt 0 ]; then 
+      addcorners "${RAWSIZE[0]}" "${RAWSIZE[1]}" "$CornerIntensity"
     fi
-    if [ $SHADOW = true ]; then
+    if [ $Shadow = true ]; then
       addshadow
     fi
     copytoclipboard
     sendnotif "Area"
+    write
   fi
 }
 
@@ -127,34 +116,36 @@ window() { # touch up later, is a little slow.
   RES=${SIZX}x${SIZY}+${POSX}+${POSY}
 
   magick /tmp/fancygrimss.png -crop $RES /tmp/fancygrimss.png
-  if [ $CORNER -gt 0 ]; then
-    addcorners "${SIZX}" "${SIZY}" "$CORNER"
+  if [ $CornerIntensity -gt 0 ]; then
+    addcorners "${SIZX}" "${SIZY}" "$CornerIntensity"
   fi
-  if [ $SHADOW = true ]; then
+  if [ $Shadow = true ]; then
     addshadow
   fi
   copytoclipboard
   sendnotif "Window"
+  write
 }
 
 full() {
   grim "/tmp/fancygrimss.png"
   prenotif
-  if [ $CORNER -gt 0 ]; then
+  if [ $CornerIntensity -gt 0 ]; then
     SIZE=$(magick /tmp/fancygrimss.png -print "%w %h" /dev/null)
     WIDTH=$(echo $SIZE | cut -d ' ' -f 1)
     HEIGHT=$(echo $SIZE | cut -d ' ' -f 2)
-    addcorners "$WIDTH" "$HEIGHT" "$CORNER"
+    addcorners "$WIDTH" "$HEIGHT" "$CornerIntensity"
   fi
-  if [ $SHADOW = true ]; then
+  if [ $Shadow = true ]; then
     addshadow
   fi
   copytoclipboard
   sendnotif "Full"
+  write
 }
 
 prenotif() {
-  if [ $NOTIF = true ]; then
+  if [ $PreNotification = true ]; then
     notify-send -t 2000 "Taking screenshot..." "Please wait.. (You can do other things while you wait.)"
     # just cuz processing takes a while
   fi
@@ -166,31 +157,31 @@ while [ $# -gt 0 ]; do
   key="$2"
   case $key in
     -d | --silence)
-      NOTIF=false
-      PRENOTIF=false
-      NOTIFIMAGE=false
+      Notification=false
+      PreNotification=false
+      NotificationImage=false
       shift
       ;;
 
     -o | --pasteonce)
-      ONEPASTE=true
+      PasteOnce=true
       shift
       ;;
     
     -s | --shadow)
-      SHADOW=true
+      Shadow=true
       shift
       ;;
 
     -i | --noimage)
-      NOTIFIMAGE=false
+      NotificationImage=false
       shift
       ;;
 
     -c | --corner)
       shift
       if [ $# -gt 0 ]; then
-        CORNER="$2"
+        CornerIntensity="$2"
         shift
       else
         echo "Error: Missing argument for $1 option."
@@ -198,8 +189,23 @@ while [ $# -gt 0 ]; do
       fi
       ;;
     -n | --nocopy)
-      COPY=false
+      CopyToClipboard=false
       shift
+      ;;
+    -w | --write)
+      WriteImage=true
+      shift
+      ;;
+    -p | --writedir)
+      shift
+      echo $2
+      if [ -d "$2" ]; then
+        WriteDirectory=$2
+        shift
+      else
+        echo "Error: Invalid argument for $1 option. Check if directory exists"
+        exit 1
+      fi
       ;;
 
     *)
