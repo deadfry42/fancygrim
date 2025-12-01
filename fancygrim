@@ -96,17 +96,21 @@ area() {
   IFS=',' read -ra RAWPOS <<< "${SPLITRAWRES[0]}"
   IFS='x' read -ra RAWSIZE <<< "${SPLITRAWRES[1]}"
   RES=${RAWSIZE[0]}x${RAWSIZE[1]}+${RAWPOS[0]}+${RAWPOS[1]}
-  kill "$hyprpicker_pid"
-  prenotif
-  convert /tmp/fancygrimss.png -crop $RES /tmp/fancygrimss.png
-  if [ $CORNER -gt 0 ]; then 
-    addcorners "${RAWSIZE[0]}" "${RAWSIZE[1]}" "$CORNER"
+  if [ "$RES" = "x++" ]; then
+    kill "$hyprpicker_pid"
+  else
+    kill "$hyprpicker_pid"
+    prenotif
+    convert /tmp/fancygrimss.png -crop $RES /tmp/fancygrimss.png
+    if [ $CORNER -gt 0 ]; then 
+      addcorners "${RAWSIZE[0]}" "${RAWSIZE[1]}" "$CORNER"
+    fi
+    if [ $SHADOW = true ]; then
+      addshadow
+    fi
+    copytoclipboard
+    sendnotif "Area"
   fi
-  if [ $SHADOW = true ]; then
-    addshadow
-  fi
-  copytoclipboard
-  sendnotif "Area"
 }
 
 window() { # touch up later, is a little slow.
