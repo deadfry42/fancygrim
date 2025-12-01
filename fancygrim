@@ -53,12 +53,12 @@ usage() {
 }
 
 addshadow() {
-  convert /tmp/fancygrimss.png \( +clone -background black -shadow 50x10+15+15 \) +swap -background none -layers merge +repage /tmp/fancygrimss.png
+  magick /tmp/fancygrimss.png \( +clone -background black -shadow 50x10+15+15 \) +swap -background none -layers merge +repage /tmp/fancygrimss.png
 }
 
 addcorners() {
-  convert -size $1x$2 xc:none -draw "roundrectangle 0,0,$1,$2,$3,$3" /tmp/fancygrimmask.png
-  convert /tmp/fancygrimss.png -matte /tmp/fancygrimmask.png \
+  magick -size $1x$2 xc:none -draw "roundrectangle 0,0,$1,$2,$3,$3" /tmp/fancygrimmask.png
+  magick /tmp/fancygrimss.png -matte /tmp/fancygrimmask.png \
     -compose DstIn -composite /tmp/fancygrimss.png
 }
 
@@ -101,7 +101,7 @@ area() {
   else
     kill "$hyprpicker_pid"
     prenotif
-    convert /tmp/fancygrimss.png -crop $RES /tmp/fancygrimss.png
+    magick /tmp/fancygrimss.png -crop $RES /tmp/fancygrimss.png
     if [ $CORNER -gt 0 ]; then 
       addcorners "${RAWSIZE[0]}" "${RAWSIZE[1]}" "$CORNER"
     fi
@@ -126,7 +126,7 @@ window() { # touch up later, is a little slow.
   SIZY=${RAWSIZE[1]}
   RES=${SIZX}x${SIZY}+${POSX}+${POSY}
 
-  convert /tmp/fancygrimss.png -crop $RES /tmp/fancygrimss.png
+  magick /tmp/fancygrimss.png -crop $RES /tmp/fancygrimss.png
   if [ $CORNER -gt 0 ]; then
     addcorners "${SIZX}" "${SIZY}" "$CORNER"
   fi
@@ -141,7 +141,7 @@ full() {
   grim "/tmp/fancygrimss.png"
   prenotif
   if [ $CORNER -gt 0 ]; then
-    SIZE=$(convert /tmp/fancygrimss.png -print "%w %h" /dev/null)
+    SIZE=$(magick /tmp/fancygrimss.png -print "%w %h" /dev/null)
     WIDTH=$(echo $SIZE | cut -d ' ' -f 1)
     HEIGHT=$(echo $SIZE | cut -d ' ' -f 2)
     addcorners "$WIDTH" "$HEIGHT" "$CORNER"
