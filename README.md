@@ -7,7 +7,9 @@ i made this because I was infuriated with the lack of good screenshotting tools.
 > This was made for Hyprland/Wayland in mind.  
 > This will not work on X11, due to the use of `slurp`.
   
-area screenshot: (`fancygrim area -c 10 -s`)
+## examples
+
+area screenshot: (`fancygrim area -c 10 -s`)  
 <img src="assets/sample_area.png">  
 window screenshot: (`fancygrim window -c 15 -s`)  
 <img src="assets/sample_window.png">  
@@ -16,10 +18,10 @@ window screenshot: (`fancygrim window -c 15 -s`)
 
 - area, window & full screenshots
 - shadows & corner rounding
-    - shadows can be toggled
-    - border radius can be configured.
+      - shadows can be toggled
+      - border radius can be configured.
 - a small range of options
-    - explained in `fancygrim usage`
+      - explained in `fancygrim usage`
 - notification w/ preview
 
 ## default settings (with no options)
@@ -64,7 +66,7 @@ sudo pacman -S grim slurp imagemagik jq wl-clipboard && yay -S hyprpicker
 ### release version (stable, recommended)
 
 ```bash
-git clone https://github.com/deadfry42/fancygrim && bash ./fancygrim/installation.sh stable
+git clone https://github.com/deadfry42/fancygrim && bash ./fancygrim/installation.sh stable`
 ```
   
 ### git version (unstable, unrecommended)
