@@ -79,3 +79,7 @@ git clone https://github.com/deadfry42/fancygrim && bash ./fancygrim/installatio
 ```
 
 (installation.sh found at the root of this repo, check if you don't trust this.)
+
+# License
+This project is licensed under [GLWTS](./LICENSE)
+Translations available at https://github.com/me-shaon/GLWTPL/tree/master/translations
