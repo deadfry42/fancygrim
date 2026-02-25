@@ -16,13 +16,13 @@ window screenshot: (`fancygrim window -c 15 -s`)
   
 ## features
 
-- area, window & full screenshots
-      - window screenshots rely on hyprctl, will not work on sway without tweaks to the code
-- shadows & corner rounding
-      - shadows can be toggled
-      - border radius can be configured.
+- area, window & full screenshots  
+  - window screenshots rely on hyprctl, will not work on sway without tweaks to the code
+- shadows & corner rounding  
+  - shadows can be toggled  
+  - border radius can be configured.  
 - a small range of options
-      - explained in `fancygrim usage`
+  - explained in `fancygrim usage`
 - notification w/ preview
 - writing screenshots to a folder
 
@@ -61,8 +61,6 @@ Arch Example:
 ```bash
 sudo pacman -S grim slurp imagemagik jq wl-clipboard hyprpicker
 ```
-
-(hyprpicker is in the AUR, bash is needed to run the command, hyprctl comes with hyprland ootb)
 
 ## installation
 
