@@ -1,11 +1,11 @@
 # fancygrim
 
-a small bash script that I use for screenshotting. (hyprland only)  
-i made this because I was infuriated with the lack of good screenshotting tools. This tool takes a screenshot and THEN resizes it, instead of taking a resizing and taking a screenshot of slurp. It also allows you to toggle a shadow and change the border radius for each individual mode. It makes it a *little* slower, but tbh i don't care all too much.
+a small bash script that I use for screenshotting. (wayland only, targetting hyprland)  
+i made this because I was infuriated with the lack of good screenshotting tools. This tool takes a screenshot and THEN resizes it, instead of taking a resizing and taking a screenshot of slurp. It also allows you to toggle a shadow and change the border radius for each individual mode. This causes a delay when taking screenshots, but that doesn't matter all too much.
 
 > [!IMPORTANT]
 > This was made for Hyprland/Wayland in mind.  
-> This will not work on X11, due to the use of `slurp`.
+> This will not work on X11, due to the use of `slurp` and `grim`.
   
 ## examples
 
@@ -17,14 +17,17 @@ window screenshot: (`fancygrim window -c 15 -s`)
 ## features
 
 - area, window & full screenshots
+      - window screenshots rely on hyprctl, will not work on sway without tweaks to the code
 - shadows & corner rounding
       - shadows can be toggled
       - border radius can be configured.
 - a small range of options
       - explained in `fancygrim usage`
 - notification w/ preview
+- writing screenshots to a folder
 
 ## default settings (with no options)
+(you can edit these defaults by opening /usr/bin/fancygrim in a text editor, eg. nano)
 
 ```bash
 Shadow=false # whether or not to have a shadow by default, you can enable this with the "--shadow" flag
@@ -56,7 +59,7 @@ WriteDirectory="/home/$USER/Pictures/" # where the image should be written to di
 Arch Example:
 
 ```bash
-sudo pacman -S grim slurp imagemagik jq wl-clipboard && yay -S hyprpicker
+sudo pacman -S grim slurp imagemagik jq wl-clipboard hyprpicker
 ```
 
 (hyprpicker is in the AUR, bash is needed to run the command, hyprctl comes with hyprland ootb)
@@ -66,7 +69,7 @@ sudo pacman -S grim slurp imagemagik jq wl-clipboard && yay -S hyprpicker
 ### release version (stable, recommended)
 
 ```bash
-git clone https://github.com/deadfry42/fancygrim && bash ./fancygrim/installation.sh stable`
+git clone https://github.com/deadfry42/fancygrim && bash ./fancygrim/installation.sh stable
 ```
   
 ### git version (unstable, unrecommended)
